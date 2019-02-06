@@ -17,23 +17,14 @@
         android:supportsRtl="true"
         android:testOnly="true"
         android:theme="@style/AppTheme" >
-        <activity android:name="ml.pho3.tp1.MainActivity" >
+        <activity android:name="ml.pho3.tp2.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="ml.pho3.tp1.CountryActivity"
-            android:label="@string/title_activity_country"
-            android:parentActivityName="ml.pho3.tp1.MainActivity" >
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
+        <activity android:name="ml.pho3.tp2.BookActivity" />
     </application>
 
 </manifest>

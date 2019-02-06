@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/home/nas02a/etudiants/inf/uapv1701795/AndroidStudioProjects/TP1/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-be/values-be.xml",
+            "outputFile": "/home/nas02a/etudiants/inf/uapv1701795/AndroidStudioProjects/TP2/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-be/values-be.xml",
             "map": [
                 {
                     "source": "/home/nas02a/etudiants/inf/uapv1701795/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/6afa77b37e4f77d8a25cae5462d3cef7/res/values-be/values-be.xml",

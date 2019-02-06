@@ -1,8 +1,27 @@
 {
     "logs": [
         {
-            "outputFile": "/home/nas02a/etudiants/inf/uapv1701795/AndroidStudioProjects/TP1/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-land/values-land.xml",
+            "outputFile": "/home/nas02a/etudiants/inf/uapv1701795/AndroidStudioProjects/TP2/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-land/values-land.xml",
             "map": [
+                {
+                    "source": "/home/nas02a/etudiants/inf/uapv1701795/.gradle/caches/transforms-1/files-1.1/design-27.1.1.aar/64b18e2d818cac5626a99cde33da0cd2/res/values-land/values-land.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "232"
+                    },
+                    "to": {
+                        "startLines": "6",
+                        "startColumns": "4",
+                        "startOffsets": "328",
+                        "endLines": "9",
+                        "endColumns": "12",
+                        "endOffsets": "505"
+                    }
+                },
                 {
                     "source": "/home/nas02a/etudiants/inf/uapv1701795/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/6afa77b37e4f77d8a25cae5462d3cef7/res/values-land/values-land.xml",
                     "from": {
