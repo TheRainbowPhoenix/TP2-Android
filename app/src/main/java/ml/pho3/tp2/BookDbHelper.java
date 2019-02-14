@@ -41,7 +41,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = String.format("CREATE TABLE %s ( %s INTEGER PRIMARY KEY, %s TEXT, %s TEXT, %s TEXT, %s TEXT, %s TEXT );", TABLE_NAME, _ID, COLUMN_BOOK_TITLE, COLUMN_AUTHORS, COLUMN_YEAR, COLUMN_GENRES, COLUMN_PUBLISHER);
+        String sql = String.format("CREATE TABLE %s ( %s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s TEXT, %s TEXT, %s TEXT );", TABLE_NAME, _ID, COLUMN_BOOK_TITLE, COLUMN_AUTHORS, COLUMN_YEAR, COLUMN_GENRES, COLUMN_PUBLISHER);
         db.execSQL(sql);
         Log.e(null, "ERROR");
         populate();
@@ -82,8 +82,17 @@ public class BookDbHelper extends SQLiteOpenHelper {
      */
     public int updateBook(Book book) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int res;
-        res = 42;
+        Log.w("updateBook","> "+book.getTitle()+" ("+book.getId()+")");
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_BOOK_TITLE,book.getTitle());
+        values.put(COLUMN_AUTHORS,book.getAuthors());
+        values.put(COLUMN_YEAR,book.getYear());
+        values.put(COLUMN_GENRES,book.getGenres());
+        values.put(COLUMN_PUBLISHER,book.getPublisher());
+        int res = db.update(TABLE_NAME, values, _ID+"="+book.getId(), null);
+        Log.w("updateBook","> "+res);
+        db.close();
+
         // updating row
         // call db.update()
         return res;
@@ -91,7 +100,7 @@ public class BookDbHelper extends SQLiteOpenHelper {
 
 
     public Cursor fetchAllBooks() {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
 
         Cursor cursor;
         cursor = db.query(TABLE_NAME, null, null,null
@@ -106,6 +115,12 @@ public class BookDbHelper extends SQLiteOpenHelper {
     public void deleteBook(Cursor cursor) {
         SQLiteDatabase db = this.getWritableDatabase();
         // call db.delete();
+        db.close();
+    }
+
+    public void deleteBook(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, _ID+"="+id, null);
         db.close();
     }
 

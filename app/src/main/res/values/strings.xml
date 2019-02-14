@@ -1,4 +1,9 @@
 <resources>
     <string name="title_activity_country">Edit Country</string>
     <string name="main">Countries</string>
+    <string name="authorsHint">Avery Monsen</string>
+    <string name="yearHint">June 30, 2010</string>
+    <string name="genresHint">Comics, Humour</string>
+    <string name="publisherHint">Chronicle Books</string>
+    <string name="titleHint">All My Friends Are Dead</string>
 </resources>

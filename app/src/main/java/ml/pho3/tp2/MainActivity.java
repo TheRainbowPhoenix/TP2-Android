@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.view.View;
+import android.widget.Toast;
 
 import static android.widget.AdapterView.*;
 
@@ -24,16 +27,25 @@ public class MainActivity extends Activity {
 
     private static HashMap<String, String> countries = new HashMap<>();
 
+    private BookAdapter bookAdapter;
+
+    private BookDbHelper bd;
+
+    private long index = -1;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BookDbHelper bd = new BookDbHelper(this);
-        bd.reload();
+        bd = new BookDbHelper(this);
+        //bd.reload();
         Cursor c = bd.fetchAllBooks();
 
         final ListView listview = (ListView) findViewById(R.id.listview);
+
+        bookAdapter = new BookAdapter(this, c);
 
         final ArrayList<String> items = new ArrayList<String>();
         /*for (String c : CountryList.getNameArray()) {
@@ -45,32 +57,35 @@ public class MainActivity extends Activity {
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
 
-        listview.setAdapter(adapter);
+        listview.setAdapter(bookAdapter);
+
+        registerForContextMenu(listview);
 
         listview.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                final String item = (String) parent.getItemAtPosition(position);
+                Cursor item = (Cursor) parent.getItemAtPosition(position);
+                long _id = item.getLong(item.getColumnIndexOrThrow(BookDbHelper._ID));
+                String title = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_BOOK_TITLE));
+                String authors = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_AUTHORS));
+                String year = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_YEAR));
+                String genres = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_GENRES));
+                String publisher = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_PUBLISHER));
+                Book book = new Book(_id, title, authors, year, genres, publisher);
+                //(long id, String title, String authors, String year, String genres, String publisher)
                 //Country c = countries.get(item);
                 Intent i = new Intent(getApplicationContext(), BookActivity.class);
-                i.putExtra("Position", position);
-                i.putExtra("Name", item);
+
+                i.putExtra("edit", 1);
+                i.putExtra("data", book);
+                /*i.putExtra("Name", item);
 
                 Bundle bundle = new Bundle();
                 //bundle.putSerializable("Country", c);
-                bundle.putString("Name", item);
+                bundle.putString("Name", item);*/
 
+                startActivityForResult(i, 1);
 
-                /*view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        Country c = CountryList.getCountry(item);
-                        Toast toast =Toast.makeText(getApplicationContext(), c.getmCapital(), Toast.LENGTH_SHORT);
-                        toast.show();
-                        //view.setAlpha(1);
-                        //adapter.notifyDataSetChanged();
-                    }
-                });*/
             }
         });
 
@@ -83,10 +98,42 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        ListView l = (ListView) v;
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+        Cursor item = (Cursor) l.getItemAtPosition(info.position);
+
+        long _id = item.getLong(item.getColumnIndexOrThrow(BookDbHelper._ID));
+        String title = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_BOOK_TITLE));
+        String authors = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_AUTHORS));
+        String year = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_YEAR));
+        String genres = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_GENRES));
+        String publisher = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_PUBLISHER));
+        Book book = new Book(_id, title, authors, year, genres, publisher);
+
+        index = _id;
+
+        menu.setHeaderTitle(book.getTitle());
+        menu.add(Menu.NONE, R.id.delete, Menu.NONE, "Delete");
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
         getMenuInflater().inflate(R.menu.mainbar, menu);
         return true;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete:
+                deleteThis(index);
+                updateList();
+                return true;
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -97,12 +144,60 @@ public class MainActivity extends Activity {
                 onBackPressed();
                 //NavUtils.navigateUpFromSameTask(this);
                 return true;
-            case R.id.action_save:
+            case R.id.action_add:
                 //saveChanges();
                 //onBackPressed();
+                createNew();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 1:
+                if(resultCode==Activity.RESULT_OK) {
+                    Log.w("result", "> update");
+                    final Book b = data.getParcelableExtra("book");
+                    bd.updateBook(b);
+                    updateList();
+                }
+                break;
+            case 2:
+                if(resultCode==Activity.RESULT_OK) {
+                    Log.w("result", "> add");
+                    final Book b = data.getParcelableExtra("book");
+                    bd.addBook(b);
+                    updateList();
+                }
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void updateList() {
+        Cursor c = bd.fetchAllBooks();
+        bookAdapter.changeCursor(c);
+        bookAdapter.notifyDataSetChanged();
+    }
+
+    private void deleteThis(long id) {
+        BookDbHelper bd = new BookDbHelper(this);
+        bd.deleteBook(id);
+        Toast toast = Toast.makeText(getApplicationContext(),
+                "Delet this "+id,
+                Toast.LENGTH_SHORT);
+
+        toast.show();
+
+        bookAdapter.notifyDataSetChanged();
+    }
+
+    public void createNew() {
+        Intent i = new Intent(getApplicationContext(), BookActivity.class);
+        startActivityForResult(i, 2);
     }
 
 }
