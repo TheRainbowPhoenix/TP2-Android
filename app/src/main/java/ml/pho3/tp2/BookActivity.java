@@ -1,6 +1,7 @@
 package ml.pho3.tp2;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,10 +17,14 @@ public class BookActivity extends Activity {
 
     private Book book;
 
+    private BookDbHelper bd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
+
+        bd = new BookDbHelper(this);
 
         Intent i = getIntent();
         int edit = i.getIntExtra("edit", 0);
@@ -107,19 +112,27 @@ public class BookActivity extends Activity {
             }
         } else {
             Log.w("name", "> "+name);
-            if(name!=null && authors!=null&&years!=null&&genres!=null&&publishers!=null && name.length()>1&&authors.length()>1&&years.length()>1&&genres.length()>1&&publishers.length()>1) {
-
+            if(name!=null && authors!=null&&years!=null&&genres!=null&&publishers!=null && name.length()>=1&&authors.length()>=1&&years.length()>=1&&genres.length()>=1&&publishers.length()>=1) {
                 Book b = new Book(name, authors, years, genres, publishers);
-                Log.w("createBook","> "+b.getTitle());
-                i.putExtra("book", b);
-                setResult(Activity.RESULT_OK, i);
-                finish();
-            } else {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "Please complete every fields",
-                        Toast.LENGTH_LONG);
+                if(bd.checkDouble(b)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(R.string.duplicated_message)
+                            .setTitle(R.string.add_error_title);
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } else {
+                    Log.w("createBook","> "+b.getTitle());
+                    i.putExtra("book", b);
+                    setResult(Activity.RESULT_OK, i);
+                    finish();
+                }
 
-                toast.show();
+            } else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(R.string.empty_message)
+                        .setTitle(R.string.create_error_message);
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         }
     }

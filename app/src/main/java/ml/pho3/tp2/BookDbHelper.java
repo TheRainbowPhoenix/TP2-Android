@@ -39,6 +39,26 @@ public class BookDbHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public boolean checkDouble(Book book) {
+        String name = book.getTitle();
+        String author = book.getAuthors();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor;
+        cursor = db.query(TABLE_NAME, null, null,null
+                ,null
+                ,null,null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        while (cursor.moveToNext()) {
+            String title = cursor.getString(cursor.getColumnIndexOrThrow(BookDbHelper.COLUMN_BOOK_TITLE));
+            String authors = cursor.getString(cursor.getColumnIndexOrThrow(BookDbHelper.COLUMN_AUTHORS));
+            Log.d("iterate", ""+title+":"+name+" "+author+":"+authors);
+            if(title.equals(name) && author.equals(authors)) return true;
+        }
+        return false;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = String.format("CREATE TABLE %s ( %s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s TEXT, %s TEXT, %s TEXT );", TABLE_NAME, _ID, COLUMN_BOOK_TITLE, COLUMN_AUTHORS, COLUMN_YEAR, COLUMN_GENRES, COLUMN_PUBLISHER);
