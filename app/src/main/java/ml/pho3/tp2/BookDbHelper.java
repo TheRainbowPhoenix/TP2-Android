@@ -44,6 +44,8 @@ public class BookDbHelper extends SQLiteOpenHelper {
         String author = book.getAuthors();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor;
+
+        //TODO: query
         cursor = db.query(TABLE_NAME, null, null,null
                 ,null
                 ,null,null);
@@ -164,9 +166,14 @@ public class BookDbHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public static Book cursorToBook(Cursor cursor) {
-        Book book = null;
-	// build a Book object from cursor
+    public static Book cursorToBook(Cursor item) {
+        long _id = item.getLong(item.getColumnIndexOrThrow(BookDbHelper._ID));
+        String title = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_BOOK_TITLE));
+        String authors = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_AUTHORS));
+        String year = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_YEAR));
+        String genres = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_GENRES));
+        String publisher = item.getString(item.getColumnIndexOrThrow(BookDbHelper.COLUMN_PUBLISHER));
+        Book book = new Book(_id, title, authors, year, genres, publisher);
         return book;
     }
 }
